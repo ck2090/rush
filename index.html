@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Squeek Rush — Hamster Sprint</title>
+<style>
+:root{--bg:#100f25;--panel:#1c1a38;--pink:#ff69b4;--gold:#ffd166;--mint:#6ee7b7;--text:#f7f4ff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% 0,#30235b,var(--bg) 55%);color:var(--text);font-family:system-ui,Arial,sans-serif;min-height:100vh;display:grid;place-items:center;padding:18px}
+.wrap{width:min(760px,100%)}header{text-align:center;margin-bottom:14px}h1{margin:0;font-size:clamp(2rem,7vw,3.5rem);letter-spacing:2px}header p{margin:4px 0;color:#c8c2e5}
+.panel{background:#1b1935;border:1px solid #46406d;border-radius:22px;padding:16px;box-shadow:0 18px 60px #0006}
+.stats{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}.stat{background:#29264a;padding:8px 13px;border-radius:12px;font-weight:700}
+.track{position:relative;height:260px;overflow:hidden;border-radius:16px;background:linear-gradient(#4d3670 0 18%,#342956 18% 100%);border:2px solid #6b5b91}
+.track:before{content:"";position:absolute;inset:18% 0 0;background:repeating-linear-gradient(90deg,transparent 0 48px,#ffffff15 49px 52px);opacity:.5}
+.finish{position:absolute;right:18px;top:18%;bottom:0;width:12px;background:repeating-conic-gradient(#fff 0 25%,#222 0 50%) 0/18px 18px}
+.lane{position:absolute;left:0;right:0;height:33.33%;border-bottom:2px dashed #ffffff35}.lane:nth-child(1){top:0}.lane:nth-child(2){top:33.33%}.lane:nth-child(3){top:66.66%;border:0}
+.runner{position:absolute;left:12px;top:calc(18% + 16px);font-size:42px;filter:drop-shadow(0 5px 4px #0008);transition:top .12s}
+.runner.you{top:calc(18% + 16px)}.runner.ai{top:calc(18% + 101px)}.runner.ai2{top:calc(18% + 186px)}
+.track-label{position:absolute;left:12px;font-size:11px;letter-spacing:1px;color:#d8d1f5}.controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+button{border:0;border-radius:14px;padding:13px 20px;font-size:16px;font-weight:800;cursor:pointer;background:var(--pink);color:#26112b;box-shadow:0 4px 0 #a83b78}button.secondary{background:#d9d2ff;box-shadow:0 4px 0 #8378b7}button:disabled{opacity:.45;cursor:not-allowed}
+.message{text-align:center;min-height:28px;margin:14px 0 0;color:var(--gold);font-weight:700}
+.hint{text-align:center;color:#bdb6d8;font-size:13px;margin:10px 0 0}
+footer{text-align:center;color:#8e87ad;font-size:12px;margin-top:14px}
+</style>
+</head>
+<body><main class="wrap">
+<header><h1>🐹 SQUEEK RUSH</h1><p>Hamster Sprint · Community mini-game</p></header>
+<section class="panel">
+<div class="stats"><div class="stat">🏁 Race <span id="race">1</span></div><div class="stat">⭐ Wins <span id="wins">0</span></div><div class="stat">⏱️ Time <span id="time">0.0</span>s</div></div>
+<div class="track" id="track">
+<div class="lane"></div><div class="lane"></div><div class="lane"></div><div class="finish"></div>
+<div class="track-label" style="top:21%">YOU</div><div class="track-label" style="top:54%">RIVAL 1</div><div class="track-label" style="top:87%">RIVAL 2</div>
+<div class="runner you" id="you">🐹</div><div class="runner ai" id="ai1">🐭</div><div class="runner ai2" id="ai2">🐹</div>
+</div>
+<div class="controls"><button id="start">START RACE</button><button class="secondary" id="boost" disabled>⚡ BOOST (SPACE)</button><button class="secondary" id="reset">RESET</button></div>
+<div class="message" id="message">Siap? Tekan START RACE untuk mulai!</div>
+<p class="hint">Tekan tombol BOOST atau spasi berulang kali untuk mempercepat hamstermu.</p>
+</section>
+<footer>Fan-made prototype · Not an official Squeekchain product or endorsement</footer>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+let active=false, pos=[0,0,0], wins=0, race=1, startAt=0, timer=null, boostUntil=0;
+function draw(){ $('you').style.left=(12+pos[0]*5.1)+'px';$('ai1').style.left=(12+pos[1]*5.1)+'px';$('ai2').style.left=(12+pos[2]*5.1)+'px';}
+function begin(){if(active)return;active=true;pos=[0,0,0];boostUntil=0;startAt=performance.now();$('message').textContent='GO GO GO! Gas hamster kamu!';$('start').disabled=true;$('boost').disabled=false;timer=setInterval(tick,100);}
+function tick(){if(!active)return;let now=performance.now();$('time').textContent=((now-startAt)/1000).toFixed(1);pos[0]+=0.45+(now<boostUntil?1.35:0);pos[1]+=0.55+Math.random()*.48;pos[2]+=0.48+Math.random()*.55;draw();let winner=pos.findIndex(x=>x>=100);if(winner!==-1)finish(winner);}
+function boost(){if(active)boostUntil=performance.now()+450;}
+function finish(w){active=false;clearInterval(timer);$('boost').disabled=true;$('start').disabled=false;if(w===0){wins++;$('message').textContent='🏆 KAMU MENANG! Hamstermu juara!';}else $('message').textContent='😅 Lawan menang kali ini. Coba balapan lagi!';$('wins').textContent=wins;$('race').textContent=++race;}
+function reset(){active=false;clearInterval(timer);pos=[0,0,0];draw();$('time').textContent='0.0';$('message').textContent='Siap? Tekan START RACE untuk mulai!';$('start').disabled=false;$('boost').disabled=true;}
+$('start').onclick=begin;$('boost').onclick=boost;$('reset').onclick=reset;document.addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();boost();}});draw();
+</script></body></html>
