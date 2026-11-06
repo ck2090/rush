@@ -1,5 +1,6 @@
 # Squeek Rush
 
+squeekchain-project: 8b6eca1f-155b-4684-a5b4-004fb9d1475e
 Squeek Rush is a small browser-based hamster sprint prototype. Players start a race, use BOOST (or the Space key), and compete against two computer-controlled rivals.
 
 ## Current status
